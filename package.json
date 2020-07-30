@@ -1,0 +1,16 @@
+{
+    "name": "reaction_bot_discord",
+    "version": "1.0.0",
+    "description": "",
+    "main": "main.js",
+    "scripts": {
+        "start": "node main.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "discord.js": "^12.2.0",
+        "dotenv": "^8.2.0",
+        "nconf": "^0.10.0"
+    }
+}
