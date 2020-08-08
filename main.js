@@ -1,67 +1,110 @@
-// LIBRERIE
+// DISCORD
 const Discord = require('discord.js')
 const client = new Discord.Client()
-const nconf = require('nconf')
-require('dotenv').config()
 
-// DEBUG
-var myArgs = process.argv.slice(2)
+// DEBUG E TESTING
 var debug = false
-if (myArgs == 'debug') debug = true
-if (debug) console.log('Debug:', debug)
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config()
+    debug = true
+}
+
+// DATABASE
+const low = require('lowdb')
+const FileSync = require('lowdb/adapters/FileSync')
+const adapter = new FileSync('db.json')
+const db = low(adapter)
+
+db.defaults({ gifBlacklistChannels: [], annoy: [] })
+    .write()
+
+const dbHandler = {
+    get: function(name) {
+        return new Promise((resolve, reject) => {
+            let result = db.get(name).value()
+            if (result != undefined) resolve(result)
+            else reject('Proprietà non esistente')
+        })
+    },
+    set: function(name, value, type, action) {
+        return new Promise((resolve, reject) => {
+            let result = db.get(name)
+            if (result.value() != undefined) {
+                if (type === 'array') {
+                    let data
+                    try {
+                        switch (action) {
+                            case 'add':
+                                result.push(value).write()
+                                break
+                            case 'remove':
+                                result.pull(value).write()
+                                break
+
+                            default:
+                                throw new Error(`invalid action for ${type}`)
+                        }
+                    } catch (err) {
+                        reject(err)
+                    }
+                    if (data) resolve(data)
+                    else resolve('done')
+                } else if (type === 'string') {
+                    let data
+                    try {
+                        switch (action) {
+                            case 'add':
+                                result.set(value).write()
+                                break
+                            case 'remove':
+                                result.unset(value).write()
+                                break
+
+                            default:
+                                throw new Error(`invalid action for ${type}`)
+                        }
+                    } catch (err) {
+                        reject(err)
+                    }
+                    if (data) resolve(data)
+                    else resolve('done')
+                } else {
+                    reject('no type given')
+                }
+            } else reject('invalid name')
+        })
+    }
+}
+
+// ERRORI
+
+class BotError {
+    constructor(error, type) {
+        this.error = error
+        this.text = config.error.defaultError.replace('{{type}}', type).replace('{{error}}', error)
+    }
+    sendError(messageToReply) {
+        messageToReply.reply(this.text)
+    }
+}
 
 // CONFIGURAZIONE ESTERNA
-nconf.use('file', { file: './config.json' })
-nconf.load()
+const config = require('./config.json')
 if (debug) console.log('File di configurazione caricato')
-
-// PREFISSO, RUOLO E GIF
-var prefix = nconf.get('prefix')
-if (debug) console.log('Prefix:', prefix)
-var permittedRole = nconf.get('role')
-if (debug) console.log('Ruolo:', permittedRole)
-var gifBlacklistChannels = nconf.get('gifBlacklistChannels')
-var gay = nconf.get('gay')
-
-// REAZIONE
-var emoji = '🏳️‍🌈'
-var gotIt = '👌'
 
 // AVVIO BOT
 client.on('ready', () => {
-    client.user.setActivity("la lenta estinzione della razza umana", { type: 'WATCHING' })
-    console.log('In attesa di comandi')
+    client.user.setActivity(config.botActivity.text, { type: config.botActivity.type })
+    console.log('Bot avviato')
 })
 
 //Nuovo membro
 client.on('guildMemberAdd', member => {
-    var channel = member.guild.channels.cache.find(ch => ch.id === '715128957732782151')
+    var channel = member.guild.channels.cache.find(ch => ch.id === config.welcome.channelId)
     if (!channel) return
     if (debug) console.log('Nuovo membro:', member.toString())
-    channel.send(`Wella, un nuovo membro è entrato? ${member}, ricorda di usare il codice XIUDERONE nello shop.`)
+    channel.send(config.welcome.text.replace('{{memberName}}', member))
 })
-
-/*
-// ANDREA REAZIONE 
-client.on('message', message => {
-    if (!message.guild) return
-    console.log('Tag:', message.author.tag, 'Id:', message.author.id)
-    if (message.author.id === '556900696776245249') {
-        message.react(emoji)
-            .catch(console.error)
-    }
-}) */
-
-
-// LOVATO REAZIONE
-/*
-client.on('message', message => {
-    if (!message.guild) return
-    if (message.author.id === '555395831432347649') {
-        message.react(emoji)
-            .catch(console.error)
-    }
-}) */
 
 
 client.on('message', async message => {
@@ -72,7 +115,7 @@ client.on('message', async message => {
     if (!message.guild) return
     if (message.author.bot) return
 
-    client.user.setActivity("la lenta estinzione della razza umana", { type: 'WATCHING' })
+    client.user.setActivity(config.botActivity.text, { type: config.botActivity.type })
 
 
     //Google Meet links parsing
@@ -84,68 +127,39 @@ client.on('message', async message => {
 
 
     //Se le gif sono sono state disattivate, elimininale
-    if (message.content.includes('tenor') && gifBlacklistChannels.includes(message.channel.id)) {
-        message.delete().catch(err => message.reply('Errore, forse premessi insufficienti: ' + err))
-        console.log('Eliminato un messaggio:', message.content)
-        return
+    if (message.content.includes('tenor')) {
+        dbHandler.get('gifBlacklistChannels')
+            .catch((err) => {
+                new BotError(err, 'db').sendError(message)
+                return
+            })
+            .then((blackList) => {
+                if (blackList.includes(message.channel.id)) {
+                    message.delete().catch(err => new BotError(err, 'delete').sendError(message))
+                    if (debug) console.log('Eliminato un messaggio:', message.content)
+                }
+            })
+
     }
 
 
     //Comandi
-    if (message.content.startsWith(prefix)) {
+    if (message.content.startsWith(config.prefix)) {
         args = message.content.split(' ')
     }
 
-    // ROTTO
-    /*
-    if (args[0] == prefix + 'gay') {
-        if (args[2] == 'off' && gay.includes(message.mentions.users.first())) {
-            let index = gay.indexOf(message.mentions.users.first())
-            if (index > -1) {
-                gay.splice(index, 1)
-            }
-            nconf.set('gay', gay)
-            nconf.save((err) => {
-                if (err) {
-                    console.error(err)
-                    return
-                }
-                if (debug) console.log('Configurazione salvata')
-            })
-            message.channel.send(`<${message.mentions.users.first()}> non è più gay`)
-        } else {
-            message.reply(`<${message.mentions.users.first()}> non è ancora gay`)
-        }
-    } else if (args[2] == 'on') {
-        if (!gay.includes(message.mentions.users.first())) {
-            gay.push(message.mentions.users.first())
-            nconf.set('gay', gay)
-            nconf.save((err) => {
-                if (err) {
-                    console.error(err)
-                    return
-                }
-                if (debug) console.log('Configurazione salvata')
-            })
-            message.channel.send(`Ora <${message.mentions.users.first()}> è gay`)
-        } else {
-            message.reply(`<${message.mentions.users.first()}> è già gay`)
-        }
-        gay = nconf.get('gay')
-
-    } else { message.reply('Stato gay non valido') }
-
-} */
-
 
     //Comando: elimina
-    if (args[0] == prefix + 'elimina') {
+    if (args[0] == config.prefix + 'elimina') {
 
-        if (message.member.roles.cache.some(role => role.name === permittedRole)) {
+        if (message.member.roles.cache.some(role => role.name === config.permittedRole)) {
 
             //Se l'utente ha il ruolo permesso, può eliminare fino a 80 msg
             var n = parseInt(args[1], 10) + 1
-            if (n == undefined || n == null || n > 80 || n < 1) return
+            if (n == undefined || n == null || n > 80 || n < 1) {
+                message.reply('Il massimo di messaggi che puoi eliminare è 80')
+                return
+            }
 
         } else {
 
@@ -156,136 +170,77 @@ client.on('message', async message => {
                 return
             }
         }
-        message.react(gotIt)
+        message.react(config.emoji.gotIt)
 
         //Elimina n messaggi
         message.channel.messages.fetch({ limit: n }).then(listMessages => {
-            message.channel.bulkDelete(listMessages).catch(err => message.reply('Errore, forse premessi: ' + err))
+            message.channel.bulkDelete(listMessages).catch(err => new BotError(err, 'delete').sendError(message))
         })
     }
 
     //Comando gif
-    if (args[0] == prefix + 'gif') {
-        if (message.member.roles.cache.some(role => role.name === permittedRole)) {
+    if (args[0] == config.prefix + 'gif') {
+        if (message.member.roles.cache.some(role => role.name === config.permittedRole)) {
             let newGifStatus = args[1]
             if (newGifStatus == undefined || newGifStatus == null) {
-                message.reply('nessuno stato specificato.')
+                new BotError('nessuno stato specificato', 'state').sendError(message)
                 return
             }
-            if (newGifStatus == 'on') {
-                if (gifBlacklistChannels.includes(message.channel.id)) {
-                    let index = gifBlacklistChannels.indexOf(message.channel.id);
-                    if (index > -1) {
-                        gifBlacklistChannels.splice(index, 1);
+            blackList = dbHandler.get('gifBlacklistChannels')
+                .catch((err) => {
+                    new BotError(err, 'db').sendError(message)
+                    return
+                })
+                .then((blackList) => {
+                    if (newGifStatus == 'on') {
+                        if (blackList.includes(message.channel.id)) {
+                            dbHandler.set('gifBlacklistChannels', message.channel.id, 'array', 'remove')
+                                .catch((err) => {
+                                    new BotError(err, 'db').sendError(message)
+                                    return
+                                })
+                            message.channel.send(`Ora le gif sono permesse in <#${message.channel.id}>`)
+                        } else {
+                            message.reply(`Il canale <#${message.channel.id}> non è presente all'interno della blacklist.`)
+                        }
+                    } else if (newGifStatus == 'off') {
+                        if (!blackList.includes(message.channel.id)) {
+                            dbHandler.set('gifBlacklistChannels', message.channel.id, 'array', 'add')
+                                .catch((err) => {
+                                    new BotError(err, 'db').sendError(message)
+                                    return
+                                })
+                            message.channel.send(`Ora le gif non sono permesse in <#${message.channel.id}>`)
+                        } else {
+                            message.reply(`Il canale <#${message.channel.id}> è già presente nella blacklist.`)
+                        }
+
+                    } else {
+                        new BotError('Stato non valido', 'state').sendError(message)
+                        return
                     }
-                    nconf.set('gifBlacklistChannels', gifBlacklistChannels)
-                    nconf.save((err) => {
-                        if (err) {
-                            console.error(err)
-                            return
-                        }
-                        if (debug) console.log('Configurazione salvata')
-                    })
-                    message.channel.send(`Ora le gif sono permesse in <#${message.channel.id}>`)
-                } else {
-                    message.reply(`Il canale <#${message.channel.id}> non è presente all'interno della blacklist.`)
-                }
-            } else if (newGifStatus == 'off') {
-                if (!gifBlacklistChannels.includes(message.channel.id)) {
-                    gifBlacklistChannels.push(message.channel.id)
-                    nconf.set('gifBlacklistChannels', gifBlacklistChannels)
-                    nconf.save((err) => {
-                        if (err) {
-                            console.error(err)
-                            return
-                        }
-                        if (debug) console.log('Configurazione salvata')
-                    })
-                    message.channel.send(`Ora le gif non sono permesse in <#${message.channel.id}>`)
-                } else {
-                    message.reply(`Il canale <#${message.channel.id}> è già presente nella blacklist.`)
-                }
+                })
 
-            } else { message.reply('Stato non valido o nuovo canale') }
-
-            gifStatus = nconf.get('gifBlacklistChannels')
         } else {
-            message.reply(`non hai il permesso di utilizzare questo comando, chiedi ad un utente con ruolo ${permittedRole}.`)
+            message.reply(`non hai il permesso di utilizzare questo comando, chiedi ad un utente con ruolo ${config.permittedRole}.`)
             return
         }
     }
 
 
     //Comando gifstatus
-    if (args[0] == prefix + 'statogif') {
-        let status = gifBlacklistChannels.includes(message.channel.id) ? 'disabilitate' : 'abilitate'
-        message.reply(`in questo canale le gif sono ${status}`)
-    }
-
-
-    //Comando: prefisso
-    if (args[0] == prefix + 'prefisso') {
-        if (message.member.roles.cache.some(role => role.name === permittedRole)) {
-            let newPrefix = args[1]
-            if (newPrefix == undefined || newPrefix == null) {
-                message.reply('nessun prefisso specificato.')
+    if (args[0] == config.prefix + 'statogif') {
+        dbHandler.get('gifBlacklistChannels').catch((err) => {
+                new BotError(err, 'db').sendError(message)
                 return
-            }
-            if (newPrefix.length >= 5) {
-                message.reply('il prefisso specificato supera i 5 caratteri consentiti.')
-                return
-            }
-            if (debug) console.log('Prefisso modificato in', newPrefix)
-            nconf.set('prefix', newPrefix)
-            nconf.save((err) => {
-                if (err) {
-                    console.error(err)
-                    return
-                }
-                if (debug) console.log('Configurazione salvata')
-
             })
-            prefix = nconf.get('prefix')
-            message.reply(`prefisso modificato in ${prefix}.`)
-        } else {
-            message.reply(`non hai il permesso di utilizzare questo comando, chiedi ad un utente con ruolo ${permittedRole}.`)
-            return
-        }
-    }
-
-
-    //Comando: ruolo
-    if (args[0] == prefix + 'ruolo') {
-        if (message.member.roles.cache.some(role => role.name === permittedRole)) {
-            let newRole = args[1]
-            if (newRole == undefined || newRole == null) {
-                message.reply('nessun ruolo specificato.')
-                return
-            }
-            let roleArray = []
-            message.guild.roles.cache.forEach(role => roleArray.push(role.name))
-            if (!roleArray.includes(newRole)) {
-                message.reply(`il ruolo ${newRole} non esiste.`)
-                return
-            }
-
-            if (debug) console.log('Ruolo modificato in', newRole)
-            nconf.set('role', newRole)
-            nconf.save((err) => {
-                if (err) {
-                    console.error(err)
-                    return
-                }
-                if (debug) console.log('Configurazione salvata')
-
+            .then((status) => {
+                message.reply(`in questo canale le gif sono ${status.includes(message.channel.id) ? 'disabilitate' : 'abilitate'}`)
             })
-            permittedRole = nconf.get('role')
-            message.reply(`ruolo modificato in ${permittedRole}.`)
-        } else {
-            message.reply(`non hai il permesso di utilizzare questo comando, chiedi ad un utente con ruolo ${permittedRole}.`)
-            return
-        }
+
     }
 })
+
+
 
 client.login(process.env.TOKEN)
