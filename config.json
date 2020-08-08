@@ -1,6 +1,18 @@
 {
-    "prefix": "!",
-    "role": "dev",
-    "gifBlacklistChannels": [],
-    "gay": []
+    "botActivity": {
+        "text": "la lenta estinzione della razza umana",
+        "type": "WATCHING"
+    },
+    "welcome": {
+        "channelId": "715128957732782151",
+        "text": "`Wella, un nuovo membro è entrato? {{memberName}}, ricorda di usare il codice XIUDERONE nello shop.`"
+    },
+    "prefix": ";;",
+    "permittedRole": "dev",
+    "emoji": {
+        "gotIt": "👌"
+    },
+    "error": {
+        "defaultError": "si è verificato un errore: {{type}}, {{error}}"
+    }
 }
