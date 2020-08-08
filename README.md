@@ -2,11 +2,16 @@
 
 ## Funzionalità
 * Saluta i nuovi membri
+* Possibilità di modificare la configurazione del bot:
+    * prefisso
+    * ruolo per l'accesso a comandi di amministrazione
+    * attività del bot
+    * testo di benvenuto
+    * errori (è sconsigliato modificare questo campo)
 * Parsing di link Google meet
-* Blocco gif prese da [Tenor](tenor.com) tramite comando **!gif <on/off>**
-* Possibilità di cambiare il prefisso tramite il comando **!prefisso \<nuovo prefisso\>**
+* Blocco gif prese da [Tenor](tenor.com) tramite comando **;;gif <on/off>**
 * Possibilità di cambiare il ruolo per l'accesso a comandi di amministrazione, di default **dev**
-* Comando **!elimina \<n messaggi\>** per l'eliminazione veloce di grandi quantità di messaggi (con limitazioni per utenti senza il ruolo per l'accesso dei comandi di amministrazione)
+* Comando **;;elimina \<n messaggi\>** per l'eliminazione veloce di grandi quantità di messaggi (con limitazioni per utenti senza il ruolo per l'accesso dei comandi di amministrazione)
 
 > Nuove funzioni verranno aggiunte quando avrò tempo
 
@@ -24,5 +29,5 @@
 ## Utilizzo con docker
 
 1. Scaricare il file zip o clonare la repository con il comando `git clone https://github.com/eliapolloniato/scuola_discord_bot.git`
-2. Creare il file **.env** con all'interno il token del vostro bot
+2. Modificare `Dockerfile`, scrivendo il vostro token al posto di `bot-token`
 3. Creare ed Avviare il container tramite il comando `bash deployDocker.sh`
