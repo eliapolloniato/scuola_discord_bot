@@ -14,5 +14,10 @@
     },
     "error": {
         "defaultError": "si è verificato un errore: {{type}}, {{error}}"
+    },
+    "moderation": {
+        "banReason": {
+            "message": "Il moderatore {{moderator}} ha deciso di bannare l'utente senza specificare il motivo"
+        }
     }
 }
