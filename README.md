@@ -29,5 +29,5 @@
 ## Utilizzo con docker
 
 1. Scaricare il file zip o clonare la repository con il comando `git clone https://github.com/eliapolloniato/scuola_discord_bot.git`
-2. Modificare `Dockerfile`, scrivendo il vostro token al posto di `bot-token`
+2. Esportare la variabile di ambiente BOT_TOKEN con il comando `export BOT_TOKEN=<il tuo token>`
 3. Creare ed Avviare il container tramite il comando `bash deployDocker.sh`
