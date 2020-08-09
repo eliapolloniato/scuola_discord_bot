@@ -113,3 +113,6 @@ dist
 
 # .env file
 .env
+
+# database
+database/db.json
