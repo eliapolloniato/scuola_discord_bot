@@ -15,7 +15,7 @@ const FileSync = require('lowdb/adapters/FileSync')
 const adapter = new FileSync('./database/db.json')
 const db = low(adapter)
 
-db.defaults({ gifBlacklistChannels: [], annoy: [] })
+db.defaults({ gifBlacklistChannels: [], moderation: { kick: 0, ban: 0 }, annoy: [] })
     .write()
 
 const dbHandler = {
@@ -74,6 +74,35 @@ const dbHandler = {
             } else reject('invalid name')
         })
     }
+}
+
+// EMBED
+function createEmbed(type, description, avatarUrl, author) {
+    let result
+    switch (type) {
+        case 'ban':
+            result = new Discord.MessageEmbed()
+                .setAuthor('LiotardoBot', avatarUrl)
+                .setTitle('Sei stato bannato dal server Scuola')
+                .addFields({ name: 'Autore', value: author }, { name: 'Motivo', value: description })
+                .setFooter('eliapolloniato')
+                .setColor(0xf54242) //red
+            break
+
+        case 'kick':
+            result = new Discord.MessageEmbed()
+                .setAuthor('LiotardoBot', avatarUrl)
+                .setTitle('Sei stato kickato dal server Scuola')
+                .addFields({ name: 'Autore', value: author }, { name: 'Motivo', value: description })
+                .setFooter('eliapolloniato')
+                .setColor(0xffb752) //orange
+            break
+            break
+
+        default:
+            return false
+    }
+    return result
 }
 
 // ERRORI
@@ -237,6 +266,81 @@ client.on('message', async message => {
                 message.reply(`in questo canale le gif sono ${status.includes(message.channel.id) ? 'disabilitate' : 'abilitate'}`)
             })
 
+    }
+
+    //Moderazione
+    //ban
+    if (args[0] == config.prefix + 'ban') {
+        if (message.member.roles.cache.some(role => role.name === config.permittedRole)) {
+            const user = message.mentions.users.first()
+            let reason
+            if (args.length > 2) reason = args.slice(2).join(' ')
+            if (user) {
+                const member = message.guild.member(user)
+                if (member) {
+                    if (member.bannable) {
+                        const delay = (msec) => new Promise((resolve) => setTimeout(resolve, msec))
+                        member.send(createEmbed('ban', reason ? reason : 'Il moderatore non ha specificato il motivo', client.user.avatarURL(), message.author.tag.toString()))
+                        await delay(800)
+                        member
+                            .ban({
+                                reason: reason ? reason : config.moderation.banReason.message.replace('{{moderator}}', message.author.tag),
+                            })
+                            .then(() => {
+                                message.reply(`L'utente ${user.tag} è stato bannato con successo`)
+                            })
+                            .catch(err => {
+                                new BotError(err, 'ban').sendError(message)
+                            })
+                    } else {
+                        message.reply('l\'utente non è bannabile')
+                    }
+                } else {
+                    message.reply('L\'utente non è all\'interno di questo server')
+                }
+            } else {
+                message.reply('non è stato specificato nessun utente da bannare')
+            }
+        } else {
+            message.reply(`non hai il permesso di utilizzare questo comando, chiedi ad un utente con ruolo ${config.permittedRole}.`)
+            return
+        }
+    }
+
+    //kick
+    if (args[0] == config.prefix + 'kick') {
+        if (message.member.roles.cache.some(role => role.name === config.permittedRole)) {
+            const user = message.mentions.users.first()
+            let reason
+            if (args.length > 2) reason = args.slice(2).join(' ')
+            if (user) {
+                const member = message.guild.member(user)
+                if (member) {
+                    if (member.kickable) {
+                        const delay = (msec) => new Promise((resolve) => setTimeout(resolve, msec))
+                        member.send(createEmbed('kick', reason ? reason : 'Il moderatore non ha specificato il motivo', client.user.avatarURL(), message.author.tag.toString()))
+                        await delay(800)
+                        member
+                            .kick()
+                            .then(() => {
+                                message.reply(`L'utente ${user.tag} è stato kickato con successo`)
+                            })
+                            .catch(err => {
+                                new BotError(err, 'kick').sendError(message)
+                            })
+                    } else {
+                        message.reply('l\'utente non è kickabile')
+                    }
+                } else {
+                    message.reply('L\'utente non è all\'interno di questo server')
+                }
+            } else {
+                message.reply('non è stato specificato nessun utente da kickare')
+            }
+        } else {
+            message.reply(`non hai il permesso di utilizzare questo comando, chiedi ad un utente con ruolo ${config.permittedRole}.`)
+            return
+        }
     }
 })
 

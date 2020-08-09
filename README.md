@@ -12,6 +12,7 @@
 * Blocco gif prese da [Tenor](tenor.com) tramite comando **;;gif <on/off>**
 * Possibilità di cambiare il ruolo per l'accesso a comandi di amministrazione, di default **dev**
 * Comando **;;elimina \<n messaggi\>** per l'eliminazione veloce di grandi quantità di messaggi (con limitazioni per utenti senza il ruolo per l'accesso dei comandi di amministrazione)
+* Comandi di moderazione: **;;kick <@Utente> \<motivo\>** e **;;ban <@Utente> \<motivo\>** utilizzabili solo dagli utenti con il ruolo per l'accesso dei comandi di amministrazione
 
 > Nuove funzioni verranno aggiunte quando avrò tempo
 
