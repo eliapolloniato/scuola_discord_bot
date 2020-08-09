@@ -12,7 +12,7 @@ if (process.env.NODE_ENV !== 'production') {
 // DATABASE
 const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync')
-const adapter = new FileSync('db.json')
+const adapter = new FileSync('./database/db.json')
 const db = low(adapter)
 
 db.defaults({ gifBlacklistChannels: [], annoy: [] })
@@ -77,7 +77,6 @@ const dbHandler = {
 }
 
 // ERRORI
-
 class BotError {
     constructor(error, type) {
         this.error = error
@@ -89,7 +88,7 @@ class BotError {
 }
 
 // CONFIGURAZIONE ESTERNA
-const config = require('./config.json')
+const config = require('./database/config.json')
 if (debug) console.log('File di configurazione caricato')
 
 // AVVIO BOT
