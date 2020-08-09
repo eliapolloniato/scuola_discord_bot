@@ -1,12 +1,16 @@
 {
-    "name": "reaction_bot_discord",
+    "name": "scuola_discord_bot",
     "version": "1.0.0",
-    "description": "",
+    "description": "Liotardobot: bot Discord del server Scuola",
     "main": "main.js",
     "scripts": {
         "start": "node main.js"
     },
-    "author": "",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/eliapolloniato/scuola_discord_bot.git"
+    },
+    "author": "eliapolloniato",
     "license": "ISC",
     "dependencies": {
         "discord.js": "^12.2.0",
