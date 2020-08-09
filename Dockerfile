@@ -1,8 +1,7 @@
 FROM node:12
 WORKDIR /usr/src/app
 
-# incolla il token al posto di bot-token
-ENV TOKEN bot-token
+ENV TOKEN $BOT_TOKEN
 ENV NODE_ENV production
 
 COPY package*.json ./
