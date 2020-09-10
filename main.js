@@ -105,6 +105,11 @@ function createEmbed(type, description, avatarUrl, author) {
     return result
 }
 
+// DELAY PER KICK E BAN
+const notificationDelay = 500
+const delay = (msec) => new Promise((resolve) => setTimeout(resolve, msec))
+
+
 // ERRORI
 class BotError {
     constructor(error, type) {
@@ -193,7 +198,7 @@ client.on('message', async message => {
 
             //Se l'utente non ha il ruolo permesso è limitato a 10 msg
             var n = parseInt(args[1], 10) + 1
-            if (n == undefined || n == null || n > 11) {
+            if (n == undefined || n == null || n > 11 || n < 1) {
                 message.reply('Il massimo di messaggi che puoi eliminare è 10')
                 return
             }
@@ -250,7 +255,7 @@ client.on('message', async message => {
                 })
 
         } else {
-            message.reply(`non hai il permesso di utilizzare questo comando, chiedi ad un utente con ruolo ${config.permittedRole}.`)
+            message.reply(config.permissions.insufficient.replace('{{role}}', config.permittedRole))
             return
         }
     }
@@ -279,30 +284,29 @@ client.on('message', async message => {
                 const member = message.guild.member(user)
                 if (member) {
                     if (member.bannable) {
-                        const delay = (msec) => new Promise((resolve) => setTimeout(resolve, msec))
                         member.send(createEmbed('ban', reason ? reason : 'Il moderatore non ha specificato il motivo', client.user.avatarURL(), message.author.tag.toString()))
-                        await delay(800)
+                        await delay(notificationDelay)
                         member
                             .ban({
                                 reason: reason ? reason : config.moderation.banReason.message.replace('{{moderator}}', message.author.tag),
                             })
                             .then(() => {
-                                message.reply(`L'utente ${user.tag} è stato bannato con successo`)
+                                message.reply(config.moderation.botResponses.ban.success.replace('{{user}}', user.tag))
                             })
                             .catch(err => {
                                 new BotError(err, 'ban').sendError(message)
                             })
                     } else {
-                        message.reply('l\'utente non è bannabile')
+                        message.reply(config.moderation.botResponses.ban.notBannable)
                     }
                 } else {
-                    message.reply('L\'utente non è all\'interno di questo server')
+                    message.reply(config.moderation.botResponses.ban.notInServer)
                 }
             } else {
-                message.reply('non è stato specificato nessun utente da bannare')
+                message.reply(config.moderation.botResponses.ban.userNotSpecified)
             }
         } else {
-            message.reply(`non hai il permesso di utilizzare questo comando, chiedi ad un utente con ruolo ${config.permittedRole}.`)
+            message.reply(config.permissions.insufficient.replace('{{role}}', config.permittedRole))
             return
         }
     }
@@ -317,28 +321,27 @@ client.on('message', async message => {
                 const member = message.guild.member(user)
                 if (member) {
                     if (member.kickable) {
-                        const delay = (msec) => new Promise((resolve) => setTimeout(resolve, msec))
                         member.send(createEmbed('kick', reason ? reason : 'Il moderatore non ha specificato il motivo', client.user.avatarURL(), message.author.tag.toString()))
-                        await delay(800)
+                        await delay(notificationDelay)
                         member
                             .kick()
                             .then(() => {
-                                message.reply(`L'utente ${user.tag} è stato kickato con successo`)
+                                message.reply(config.moderation.botResponses.kick.success.replace('{{user}}', user.tag))
                             })
                             .catch(err => {
                                 new BotError(err, 'kick').sendError(message)
                             })
                     } else {
-                        message.reply('l\'utente non è kickabile')
+                        message.reply(config.moderation.botResponses.kick.notKickable)
                     }
                 } else {
-                    message.reply('L\'utente non è all\'interno di questo server')
+                    message.reply(config.moderation.botResponses.kick.notInServer)
                 }
             } else {
-                message.reply('non è stato specificato nessun utente da kickare')
+                message.reply(config.moderation.botResponses.kick.userNotSpecified)
             }
         } else {
-            message.reply(`non hai il permesso di utilizzare questo comando, chiedi ad un utente con ruolo ${config.permittedRole}.`)
+            message.reply(config.permissions.insufficient.replace('{{role}}', config.permittedRole))
             return
         }
     }
