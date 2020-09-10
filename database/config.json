@@ -5,7 +5,7 @@
     },
     "welcome": {
         "channelId": "715128957732782151",
-        "text": "`Wella, un nuovo membro è entrato? {{memberName}}, ricorda di usare il codice XIUDERONE nello shop.`"
+        "text": "Wella, un nuovo membro è entrato? {{memberName}}, ricorda di usare il codice XIUDERONE nello shop."
     },
     "prefix": ";;",
     "permittedRole": "dev",
@@ -18,6 +18,23 @@
     "moderation": {
         "banReason": {
             "message": "Il moderatore {{moderator}} ha deciso di bannare l'utente senza specificare il motivo"
+        },
+        "botResponses": {
+            "ban": {
+                "success": "l'utente {{user}} è stato bannato con successo!",
+                "notBannable": "l'utente non è bannabile",
+                "notInServer": "l'utente non è all'interno di questo server",
+                "userNotSpecified": "non è stato specificato nessun utente da bannare"
+            },
+            "kick": {
+                "success": "l'utente {{user}} è stato kickato con successo!",
+                "notKickable": "l'utente non è kickabile",
+                "notInServer": "l'utente non è all'interno di questo server",
+                "userNotSpecified": "non è stato specificato nessun utente da kickare"
+            }
         }
+    },
+    "permissions": {
+        "insufficient": "non hai il permesso di utilizzare questo comando, chiedi ad un utente con ruolo {{role}}."
     }
 }
