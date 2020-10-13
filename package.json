@@ -13,9 +13,11 @@
     "author": "eliapolloniato",
     "license": "ISC",
     "dependencies": {
+        "axios": "^0.20.0",
         "discord.js": "^12.2.0",
         "dotenv": "^8.2.0",
         "lowdb": "^1.0.0",
+        "moment": "^2.29.1",
         "nconf": "^0.10.0"
     }
 }
