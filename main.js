@@ -15,6 +15,11 @@ const FileSync = require('lowdb/adapters/FileSync')
 const adapter = new FileSync('./database/db.json')
 const db = low(adapter)
 
+// FETCH
+const axios = require('axios')
+const covid_italia = 'https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-covid19-ita-andamento-nazionale-latest.json'
+const moment = require('moment')
+
 db.defaults({ gifBlacklistChannels: [], moderation: { kick: 0, ban: 0 }, annoy: [] })
     .write()
 
@@ -344,6 +349,24 @@ client.on('message', async message => {
             message.reply(config.permissions.insufficient.replace('{{role}}', config.permittedRole))
             return
         }
+    }
+
+    //COVID-19
+    if (args[0] == config.prefix + 'covid') {
+        axios.get(covid_italia)
+            .catch((err) => {
+                new BotError(err, 'fetch-covid').sendError(message)
+            })
+            .then((res) => {
+                let casi = res.data[0]
+                let risposta = new Discord.MessageEmbed()
+                    .setFooter(`Dati aggiornati a ${moment(casi.data).locale('it').format('lll')}`)
+                    .setTitle('Dati Covid19 Italia')
+                    .setDescription(`Casi totali: ${casi.totale_casi}\nNuovi positivi: ${casi.nuovi_positivi}\nDeceduti: ${casi.deceduti}`)
+                    .setColor('#aaf542')
+                    .setThumbnail('https://phil.cdc.gov//PHIL_Images/23311/23311_lores.jpg')
+                message.reply(risposta)
+            })
     }
 })
 
