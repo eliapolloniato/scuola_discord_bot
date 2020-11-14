@@ -15,6 +15,14 @@
     "error": {
         "defaultError": "si è verificato un errore: {{type}}, {{error}}"
     },
+    "gif": {
+        "on": "Ora le gif sono permesse in <#{{channel}}>",
+        "off": "Ora le gif non sono permesse in <#{{channel}}>",
+        "inBlacklist": {
+            "true": "Il canale <#{{channel}}> è già presente nella blacklist.",
+            "false": "Il canale <#{{channel}}> non è presente nella blacklist."
+        }
+    },
     "moderation": {
         "banReason": {
             "message": "Il moderatore {{moderator}} ha deciso di bannare l'utente senza specificare il motivo"
