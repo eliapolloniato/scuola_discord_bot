@@ -7,7 +7,7 @@ const covid_italia = 'https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/
 const moment = require('moment')
 
 // EMBED
-function createEmbed(type, description, avatarUrl, author) {
+function createEmbed(Discord, type, description, avatarUrl, author) {
     let result
     switch (type) {
         case 'ban':
@@ -56,7 +56,7 @@ const config = require('./database/config.json')
 const db = require('./dbHandler')
 
 
-const moduleHandler = function (client, message) {
+const moduleHandler = function (Discord, client, message) {
     return new Promise((resolve, reject) => {
 
         try {
@@ -195,7 +195,7 @@ const moduleHandler = function (client, message) {
                         const member = message.guild.member(user)
                         if (member) {
                             if (member.bannable) {
-                                member.send(createEmbed('ban', reason ? reason : 'Il moderatore non ha specificato il motivo', client.user.avatarURL(), message.author.tag.toString()))
+                                member.send(createEmbed(Discord, 'ban', reason ? reason : 'Il moderatore non ha specificato il motivo', client.user.avatarURL(), message.author.tag.toString()))
                                 delay(notificationDelay).then(() => {
                                     member
                                         .ban({
@@ -233,7 +233,7 @@ const moduleHandler = function (client, message) {
                         const member = message.guild.member(user)
                         if (member) {
                             if (member.kickable) {
-                                member.send(createEmbed('kick', reason ? reason : 'Il moderatore non ha specificato il motivo', client.user.avatarURL(), message.author.tag.toString()))
+                                member.send(createEmbed(Discord, 'kick', reason ? reason : 'Il moderatore non ha specificato il motivo', client.user.avatarURL(), message.author.tag.toString()))
                                 delay(notificationDelay).then(() => {
                                     member
                                         .kick()

@@ -42,7 +42,7 @@ client.on('message', async message => {
 
     client.user.setActivity(config.botActivity.text, { type: config.botActivity.type })
 
-    modules(client, message)
+    modules(Discord, client, message)
         .catch((err) => {
             console.error(err)
         })
