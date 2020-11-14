@@ -42,9 +42,7 @@ client.on('message', async message => {
 
     client.user.setActivity(config.botActivity.text, { type: config.botActivity.type })
 
-    console.log(message.author.id)
-
-    modules(message)
+    modules(client, message)
         .catch((err) => {
             console.error(err)
         })

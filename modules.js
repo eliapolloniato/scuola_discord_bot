@@ -56,7 +56,7 @@ const config = require('./database/config.json')
 const db = require('./dbHandler')
 
 
-const moduleHandler = function (message) {
+const moduleHandler = function (client, message) {
     return new Promise((resolve, reject) => {
 
         try {
