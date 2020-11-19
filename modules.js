@@ -1,3 +1,4 @@
+var debug = false
 if (process.env.NODE_ENV !== 'production') {
     debug = true
 }
@@ -5,6 +6,20 @@ if (process.env.NODE_ENV !== 'production') {
 const axios = require('axios')
 const covid_italia = 'https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-json/dpc-covid19-ita-andamento-nazionale-latest.json'
 const moment = require('moment')
+
+// CONFIGURAZIONE ESTERNA
+const config = require('./database/config.json')
+
+// VERSION
+var version
+axios.get('https://api.github.com/repos/eliapolloniato/scuola_discord_bot/commits', {
+    headers: {
+        'Accept': ' application/vnd.github.groot-preview+json'
+    }
+}).then(({ data }) => {
+    version = data[0].sha.slice(0, 7)
+    console.log(version)
+})
 
 // EMBED
 function createEmbed(Discord, type, description, avatarUrl, author) {
@@ -15,7 +30,7 @@ function createEmbed(Discord, type, description, avatarUrl, author) {
                 .setAuthor('LiotardoBot', avatarUrl)
                 .setTitle('Sei stato bannato dal server Scuola')
                 .addFields({ name: 'Autore', value: author }, { name: 'Motivo', value: description })
-                .setFooter('eliapolloniato')
+                .setFooter('Versione: ' + version)
                 .setColor(0xf54242) //red
             break
 
@@ -24,7 +39,7 @@ function createEmbed(Discord, type, description, avatarUrl, author) {
                 .setAuthor('LiotardoBot', avatarUrl)
                 .setTitle('Sei stato kickato dal server Scuola')
                 .addFields({ name: 'Autore', value: author }, { name: 'Motivo', value: description })
-                .setFooter('eliapolloniato')
+                .setFooter('Versione: ' + version)
                 .setColor(0xffb752) //orange
             break
 
@@ -48,9 +63,6 @@ class BotError {
         messageToReply.reply(this.text)
     }
 }
-
-// CONFIGURAZIONE ESTERNA
-const config = require('./database/config.json')
 
 // DATABASE
 const db = require('./dbHandler')
