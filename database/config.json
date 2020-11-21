@@ -4,8 +4,7 @@
         "type": "WATCHING"
     },
     "welcome": {
-        "channelIdold": "715128957732782151",
-        "channelId": "705388581128241183",
+        "channelId": "715128957732782151",
         "text": "Wella, un nuovo membro è entrato? {{memberName}}, ricorda di usare il codice XIUDERONE nello shop."
     },
     "prefix": ";;",
