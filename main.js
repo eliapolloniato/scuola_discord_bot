@@ -6,6 +6,8 @@ const client = new Discord.Client()
 var debug = false
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config()
+}
+if (process.argv[2] == 'debug') {
     debug = true
 }
 
@@ -24,8 +26,9 @@ client.on('ready', () => {
 })
 
 //Nuovo membro
+
 client.on('guildMemberAdd', member => {
-    var channel = member.guild.channels.cache.find(ch => ch.id === config.welcome.channelId)
+    const channel = member.guild.channels.cache.find(ch => ch.id === config.welcome.channelId)
     if (!channel) return
     if (debug) console.log('Nuovo membro:', member.toString())
     channel.send(config.welcome.text.replace('{{memberName}}', member))
@@ -34,20 +37,20 @@ client.on('guildMemberAdd', member => {
 
 client.on('message', async message => {
 
-    var args = []
-
     //Controllo messaggi
     if (!message.guild) return
     if (message.author.bot) return
 
+    //Refresh botActivity
     client.user.setActivity(config.botActivity.text, { type: config.botActivity.type })
 
-    modules(Discord, client, message)
-        .catch((err) => {
+    modules(client, message)
+        .catch(err => {
             console.error(err)
+            return
         })
-        .then((result) => {
-            if (debug) console.log(result)
+        .then(result => {
+            if (debug && result != undefined) console.log(result)
         })
 
 })

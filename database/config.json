@@ -4,20 +4,22 @@
         "type": "WATCHING"
     },
     "welcome": {
-        "channelId": "715128957732782151",
+        "channelIdold": "715128957732782151",
+        "channelId": "705388581128241183",
         "text": "Wella, un nuovo membro è entrato? {{memberName}}, ricorda di usare il codice XIUDERONE nello shop."
     },
     "prefix": ";;",
     "permittedRole": "dev",
-    "emoji": {
+    "reaction": {
         "gotIt": "👌"
     },
     "error": {
-        "defaultError": "si è verificato un errore: {{type}}, {{error}}"
+        "defaultError": "si è verificato un errore: {{type}}, {{error}}",
+        "elimina": "Puoi eliminare da {{min}} ai {{max}} messaggi."
     },
     "gif": {
-        "on": "Ora le gif sono permesse in <#{{channel}}>",
-        "off": "Ora le gif non sono permesse in <#{{channel}}>",
+        "on": "Ora le gif sono permesse in <#{{channel}}>!",
+        "off": "Ora le gif non sono permesse in <#{{channel}}>!",
         "inBlacklist": {
             "true": "Il canale <#{{channel}}> è già presente nella blacklist.",
             "false": "Il canale <#{{channel}}> non è presente nella blacklist."
@@ -25,24 +27,25 @@
     },
     "moderation": {
         "banReason": {
-            "message": "Il moderatore {{moderator}} ha deciso di bannare l'utente senza specificare il motivo"
+            "message": "Il moderatore {{moderator}} ha deciso di bannare l'utente senza specificare il motivo."
         },
         "botResponses": {
             "ban": {
                 "success": "l'utente {{user}} è stato bannato con successo!",
-                "notBannable": "l'utente non è bannabile",
-                "notInServer": "l'utente non è all'interno di questo server",
-                "userNotSpecified": "non è stato specificato nessun utente da bannare"
+                "notBannable": "l'utente non è bannabile.",
+                "notInServer": "l'utente non è all'interno di questo server.",
+                "userNotSpecified": "non è stato specificato nessun utente da bannare."
             },
             "kick": {
                 "success": "l'utente {{user}} è stato kickato con successo!",
-                "notKickable": "l'utente non è kickabile",
-                "notInServer": "l'utente non è all'interno di questo server",
-                "userNotSpecified": "non è stato specificato nessun utente da kickare"
+                "notKickable": "l'utente non è kickabile.",
+                "notInServer": "l'utente non è all'interno di questo server.",
+                "userNotSpecified": "non è stato specificato nessun utente da kickare."
             }
         }
     },
     "permissions": {
         "insufficient": "non hai il permesso di utilizzare questo comando, chiedi ad un utente con ruolo {{role}}."
-    }
+    },
+    "urlOrario": "http://fermibassano.edu.it/OrarioAlunni/classi/edc0000012p00001s3fffffffffffffff_2_einf_ac.png"
 }
