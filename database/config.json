@@ -46,5 +46,6 @@
     "permissions": {
         "insufficient": "non hai il permesso di utilizzare questo comando, chiedi ad un utente con ruolo {{role}}."
     },
-    "urlOrario": "http://fermibassano.edu.it/OrarioAlunni/classi/edc0000012p00001s3fffffffffffffff_2_einf_ac.png"
+    "urlOrario": "http://fermibassano.edu.it/OrarioAlunni/classi/edc0000012p00001s3fffffffffffffff_2_einf_ac.png",
+    "linkMeetChannel": "789545836685033483"
 }

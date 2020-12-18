@@ -24,13 +24,17 @@ axios.get('https://api.github.com/repos/eliapolloniato/scuola_discord_bot/commit
     headers: {
         'Accept': ' application/vnd.github.groot-preview+json'
     }
-}).then(({ data }) => {
-    version = data[0].sha.slice(0, 7) || ''
-    if (debug) {
-        version = version + '_dev'
-        console.log('Version: ', version)
-    }
 })
+    .catch((err) => {
+        console.error(err)
+    })
+    .then(({ data }) => {
+        version = data[0].sha.slice(0, 7) || ''
+        if (debug) {
+            version = version + '_dev'
+            console.log('Version: ', version)
+        }
+    })
 
 // EMBED
 function createEmbed(type, description, avatarUrl, author) {
@@ -113,10 +117,10 @@ const moduleHandler = function (client, message) {
     return new Promise((resolve, reject) => {
 
         //Google Meet links parsing
-        if (message.content.includes('meet.google.com') && message.content.includes('?')) {
-            let link = message.content.split('?')[0]
+        if (message.content.includes('meet.google.com')) {
+            let link = message.content.split('?')[0] + `\nInviato in ${message.channel} da <@${message.author.id}>`
             message.delete()
-            message.channel.send(link)
+            client.channels.cache.get(config.linkMeetChannel).send(link)
         }
 
 
