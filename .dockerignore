@@ -1,1 +1,2 @@
-database/*
+database/db.json
+deployDocker.sh

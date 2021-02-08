@@ -22,7 +22,7 @@ const modules = require('./modules')
 // AVVIO BOT
 client.on('ready', () => {
     client.user.setActivity(config.botActivity.text, { type: config.botActivity.type })
-    console.log('Bot avviato')
+    console.log('BOT PRONTO')
 })
 
 //Nuovo membro
